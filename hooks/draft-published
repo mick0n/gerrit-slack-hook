@@ -1,0 +1,3 @@
+#!/bin/bash
+
+node /path/to/gerrit-slack-hook/app "--action" "draft-published" $@
