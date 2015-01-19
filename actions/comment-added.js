@@ -1,13 +1,13 @@
-var service = require('./../actionservice');
-var IO = require('./../IO');
+var publisher = require('./../slackpublisher');
+var gerritservice = require('./../gerritservice');
 
 module.exports.run = function commentAdded(args) {
 	if(args['is-draft'] == 'true'){
 		return;
 	}
-	IO.getCommitMessage(args.change)
+	gerritservice.getCommitMessageREST(args.change)
 		.then(function(subject) {
-			service.handle(args.project, getString(args, subject));
+			publisher.publish(args.project, getString(args, subject));
 		})
 		.catch(function(error) {
 			console.log(error);
@@ -16,10 +16,6 @@ module.exports.run = function commentAdded(args) {
 };
 
 function getString(args, subject) {
-	var string = args.project + '-' + args.branch + ': ' + args.author;
-	if (args['Code-Review']) {
-		string = string + ' gave a score of ' + args['Code-Review'] + ' and';
-	}
-	string = string + ' reviewed <' + args['change-url'] + '|' + subject + '>';
+	var string = args.project + '-' + args.branch + ': ' + args.author + ' reviewed <' + args['change-url'] + '|' + subject + '>:\n' + args.comment;
 	return string;
 }

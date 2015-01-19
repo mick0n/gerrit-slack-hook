@@ -1,41 +1,44 @@
-var changeMerged = require('./actions/change-merged');
-var commentAdded = require('./actions/comment-added');
-var draftPublished = require('./actions/draft-published');
-var mergeFailed = require('./actions/merge-failed');
-var patchsetCreated = require('./actions/patchset-created');
-
 var args = parseArguments(process.argv);
 performAction(args);
 
-function performAction(args){
+function performAction(args) {
 	switch (args.action) {
 		case 'change-merged':
-			changeMerged.run(args);
+			require('./actions/change-merged').run(args);
 			break;
 		case 'comment-added':
-			commentAdded.run(args);
+			require('./actions/comment-added').run(args);
 			break;
 		case 'draft-published':
-			draftPublished.run(args);
+			require('./actions/draft-published').run(args);
 			break;
 		case 'merge-failed':
-			mergeFailed.run(args);
+			require('./actions/merge-failed').run(args);
 			break;
 		case 'patchset-created':
-			patchsetCreated.run(args);
+			require('./actions/patchset-created').run(args);
 			break;
 		default:
 			console.log('No such action');
 	}
 }
 
-function parseArguments(args){
-	var options = {};
-	for(var i = 0; i < args.length; i++){
-		if(args[i].length > 2 && args[i].substring(0, 2) === '--') {
-			options[args[i].substring(2, args[i].length)] = args[i + 1];
-			i++; //Jump one extra
+function parseArguments(args) {
+	var argumentsObject = {};
+	var currentKey;
+	args.forEach(function(arg) {
+		if (arg.length > 2 && arg.substring(0, 2) === '--') {
+			var key = arg.substring(2, arg.length);
+			argumentsObject[key] = '';
+			currentKey = key;
+		} else {
+			if (currentKey) {
+				if (argumentsObject[currentKey]) {
+					argumentsObject[currentKey] += ' ';
+				}
+				argumentsObject[currentKey] += arg;
+			}
 		}
-	}
-	return options;
+	});
+	return argumentsObject;
 }

@@ -1,13 +1,13 @@
-var service = require('./../actionservice');
-var IO = require('./../IO');
+var publisher = require('./../slackpublisher');
+var gerritservice = require('./../gerritservice');
 
 module.exports.run = function patchsetCreated(args) {
 	if(args['is-draft'] == 'true'){
 		return;
 	}
-	IO.getCommitMessage(args.change)
+	gerritservice.getCommitMessageSSH(args.change)
 		.then(function(subject) {
-			service.handle(args.project, getString(args, subject));
+			publisher.publish(args.project, getString(args, subject));
 		})
 		.catch(function(error) {
 			console.log(error);

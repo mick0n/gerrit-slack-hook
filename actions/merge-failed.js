@@ -1,10 +1,10 @@
-var service = require('./../actionservice');
-var IO = require('./../IO');
+var publisher = require('./../slackpublisher');
+var gerritservice = require('./../gerritservice');
 
 module.exports.run = function mergeFailed(args) {
-	IO.getCommitMessage(args.change)
+	gerritservice.getCommitMessageSSH(args.change)
 		.then(function(subject) {
-			service.handle(args.project, getString(args, subject));
+			publisher.publish(args.project, getString(args, subject));
 		})
 		.catch(function(error) {
 			console.log(error);
@@ -13,6 +13,6 @@ module.exports.run = function mergeFailed(args) {
 };
 
 function getString(args, subject) {
-	var string = args.project + '-' + args.branch + ': <' + args['change-url'] + '|' + subject + '> failed to merge!';
+	var string = args.project + '-' + args.branch + ': <' + args['change-url'] + '|' + subject + '> failed to merge\n\n' + args.reason;
 	return string;
 }
