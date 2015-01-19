@@ -5,7 +5,7 @@ module.exports.run = function commentAdded(args) {
 	if(args['is-draft'] == 'true'){
 		return;
 	}
-	gerritservice.getCommitMessageREST(args.change)
+	gerritservice.getCommitMessageSSH(args.change)
 		.then(function(subject) {
 			publisher.publish(args.project, getString(args, subject));
 		})
